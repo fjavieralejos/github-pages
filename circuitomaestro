@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breakout: El Circuito Maestro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8; /* Un gris azulado claro */
+        }
+        .mission-section {
+            display: none; /* Ocultar misiones por defecto */
+            animation: fadeIn 0.5s ease-out;
+        }
+        .mission-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .input-field, .crossword-input {
+            border: 2px solid #cbd5e1;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            transition: border-color 0.2s;
+        }
+        .input-field:focus, .crossword-input:focus {
+            border-color: #4f46e5; /* Indigo-600 */
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+        }
+        .crossword-input {
+            width: 2.5rem; /* Ancho para una letra */
+            height: 2.5rem;
+            text-align: center;
+            font-size: 1.125rem; /* text-lg */
+            text-transform: uppercase;
+            margin: 0.125rem; /* Espacio pequeño entre letras */
+        }
+        .submit-button {
+            background-color: #4f46e5; /* Indigo-600 */
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .submit-button:hover {
+            background-color: #4338ca; /* Indigo-700 */
+        }
+        .help-button {
+            background-color: #fbbf24; /* Amber-400 */
+            color: #78350f; /* Amber-900 */
+            padding: 0.4rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+        .help-button:hover {
+            background-color: #f59e0b; /* Amber-500 */
+        }
+        .help-content {
+            display: none;
+            background-color: #fef3c7; /* Amber-100 */
+            border-left: 4px solid #f59e0b; /* Amber-500 */
+            padding: 1rem;
+            margin-top: 0.5rem;
+            border-radius: 0.25rem;
+            color: #78350f; /* Amber-900 */
+        }
+        .circuit-image, .component-svg {
+            max-width: 300px;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+            margin: 1rem auto;
+            display: block; /* Para centrar SVGs */
+        }
+        .component-svg {
+            height: 3rem; /* 48px */
+            width: auto; /* Mantener proporción */
+            border: none; /* Quitar borde para símbolos */
+            margin-bottom: 0.25rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div id="game-container" class="bg-white w-full max-w-2xl p-6 md:p-10 rounded-xl shadow-2xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-indigo-700">El Circuito Maestro</h1>
+            <p class="text-lg text-gray-600 mt-1">Misión Alto Voltaje</p>
+        </header>
+
+        <!-- Introducción -->
+        <section id="intro-section" class="mission-section active">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-4">¡Alerta, Ingenieros!</h2>
+            <p class="mb-3">Sois un equipo de ingenieros novatos en 'Spark Innovators'. El Dr. Ohm trabajaba en el 'Circuito Maestro', una fuente de energía revolucionaria. Pero 'Dark Current Inc.' ha saboteado el laboratorio.</p>
+            <p class="mb-6">Debéis resolver una serie de enigmas eléctricos y electrónicos para reactivar el Circuito Maestro. ¡El tiempo corre!</p>
+            <button onclick="startMission('mission1')" class="submit-button w-full">Comenzar Misión 1</button>
+        </section>
+
+        <!-- Misión 1: Acceso al Laboratorio -->
+        <section id="mission1" class="mission-section">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Misión 1: Acceso al Laboratorio Bloqueado</h2>
+            <p class="mb-2">La puerta al conocimiento se abre con la ley fundamental que relaciona Voltaje, Intensidad y Resistencia. El apellido de su descubridor es la primera parte de la clave.</p>
+            <input type="text" id="m1_clue1_answer" placeholder="Apellido del descubridor" class="input-field w-full mb-3">
+
+            <div class="my-6 p-4 border border-gray-300 rounded-lg bg-gray-50">
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Crucigrama Eléctrico Interactivo</h3>
+                <p class="text-sm text-gray-600 mb-3">Completa las palabras. Las letras en las casillas <span class="font-bold text-yellow-600">amarillas</span> (subrayadas) forman la segunda parte de la clave (de arriba a abajo).</p>
+
+                <!-- Palabra 1: VOLTIO -->
+                <div class="mb-3">
+                    <label for="cw_voltio_0" class="block text-sm font-medium text-gray-700 mb-1">1. Unidad de Voltaje (6 letras):</label>
+                    <div class="flex">
+                        <input type="text" maxlength="1" id="cw_voltio_0" data-word="voltio" data-index="0" class="crossword-input keyword-letter"> <!-- V -->
+                        <input type="text" maxlength="1" id="cw_voltio_1" data-word="voltio" data-index="1" class="crossword-input"> <!-- O -->
+                        <input type="text" maxlength="1" id="cw_voltio_2" data-word="voltio" data-index="2" class="crossword-input"> <!-- L -->
+                        <input type="text" maxlength="1" id="cw_voltio_3" data-word="voltio" data-index="3" class="crossword-input"> <!-- T -->
+                        <input type="text" maxlength="1" id="cw_voltio_4" data-word="voltio" data-index="4" class="crossword-input"> <!-- I -->
+                        <input type="text" maxlength="1" id="cw_voltio_5" data-word="voltio" data-index="5" class="crossword-input"> <!-- O -->
+                    </div>
+                </div>
+
+                <!-- Palabra 2: LEY -->
+                <div class="mb-3">
+                    <label for="cw_ley_0" class="block text-sm font-medium text-gray-700 mb-1">2. Relación matemática fundamental en electricidad (3 letras):</label>
+                    <div class="flex">
+                        <input type="text" maxlength="1" id="cw_ley_0" data-word="ley" data-index="0" class="crossword-input keyword-letter"> <!-- L -->
+                        <input type="text" maxlength="1" id="cw_ley_1" data-word="ley" data-index="1" class="crossword-input"> <!-- E -->
+                        <input type="text" maxlength="1" id="cw_ley_2" data-word="ley" data-index="2" class="crossword-input"> <!-- Y -->
+                    </div>
+                </div>
+
+                <!-- Palabra 3: OHMIOS -->
+                <div class="mb-3">
+                    <label for="cw_ohmios_0" class="block text-sm font-medium text-gray-700 mb-1">3. Unidad de Resistencia (6 letras):</label>
+                    <div class="flex">
+                        <input type="text" maxlength="1" id="cw_ohmios_0" data-word="ohmios" data-index="0" class="crossword-input"> <!-- O -->
+                        <input type="text" maxlength="1" id="cw_ohmios_1" data-word="ohmios" data-index="1" class="crossword-input"> <!-- H -->
+                        <input type="text" maxlength="1" id="cw_ohmios_2" data-word="ohmios" data-index="2" class="crossword-input keyword-letter"> <!-- M -->
+                        <input type="text" maxlength="1" id="cw_ohmios_3" data-word="ohmios" data-index="3" class="crossword-input"> <!-- I -->
+                        <input type="text" maxlength="1" id="cw_ohmios_4" data-word="ohmios" data-index="4" class="crossword-input"> <!-- O -->
+                        <input type="text" maxlength="1" id="cw_ohmios_5" data-word="ohmios" data-index="5" class="crossword-input"> <!-- S -->
+                    </div>
+                </div>
+                <p id="crossword_feedback" class="text-sm mt-2"></p>
+                <input type="text" id="m1_crossword_key" placeholder="Clave del crucigrama (3 letras)" class="input-field w-full mt-3" readonly>
+            </div>
+
+
+            <p class="mb-2 mt-4">Observa el circuito serie: R1=10Ω, R2=20Ω, R3=30Ω. Calcula la Resistencia Total (en Ohms). Ese número es la tercera parte.</p>
+            <!-- Imagen del circuito serie (placeholder, reemplazar por una real o SVG) -->
+            <svg viewBox="0 0 200 100" class="circuit-image" xmlns="http://www.w3.org/2000/svg">
+                <line x1="10" y1="50" x2="30" y2="50" stroke="black" stroke-width="1"/>
+                <rect x="30" y="45" width="10" height="10" fill="white" stroke="black" stroke-width="1"/>
+                <text x="35" y="40" font-size="8">9V</text>
+                <line x1="40" y1="50" x2="60" y2="50" stroke="black" stroke-width="1"/>
+                <!-- Resistencia R1 -->
+                <line x1="60" y1="50" x2="65" y2="40" stroke="black" stroke-width="1"/>
+                <line x1="65" y1="40" x2="75" y2="60" stroke="black" stroke-width="1"/>
+                <line x1="75" y1="60" x2="85" y2="40" stroke="black" stroke-width="1"/>
+                <line x1="85" y1="40" x2="90" y2="50" stroke="black" stroke-width="1"/>
+                <text x="70" y="35" font-size="8">R1</text>
+                <line x1="90" y1="50" x2="100" y2="50" stroke="black" stroke-width="1"/>
+                <!-- Resistencia R2 -->
+                <line x1="100" y1="50" x2="105" y2="40" stroke="black" stroke-width="1"/>
+                <line x1="105" y1="40" x2="115" y2="60" stroke="black" stroke-width="1"/>
+                <line x1="115" y1="60" x2="125" y2="40" stroke="black" stroke-width="1"/>
+                <line x1="125" y1="40" x2="130" y2="50" stroke="black" stroke-width="1"/>
+                <text x="110" y="35" font-size="8">R2</text>
+                <line x1="130" y1="50" x2="140" y2="50" stroke="black" stroke-width="1"/>
+                <!-- Resistencia R3 -->
+                <line x1="140" y1="50" x2="145" y2="40" stroke="black" stroke-width="1"/>
+                <line x1="145" y1="40" x2="155" y2="60" stroke="black" stroke-width="1"/>
+                <line x1="155" y1="60" x2="165" y2="40" stroke="black" stroke-width="1"/>
+                <line x1="165" y1="40" x2="170" y2="50" stroke="black" stroke-width="1"/>
+                <text x="150" y="35" font-size="8">R3</text>
+                <line x1="170" y1="50" x2="190" y2="50" stroke="black" stroke-width="1"/>
+                <line x1="190" y1="50" x2="190" y2="50" stroke="black" stroke-width="1"/> <!-- Cierra el circuito -->
+             </svg>
+            <input type="number" id="m1_clue3_answer" placeholder="Resistencia Total (Ω)" class="input-field w-full mb-4">
+
+            <button onclick="checkMission1()" class="submit-button w-full">Verificar Acceso</button>
+            <button onclick="toggleHelp('m1_help')" class="help-button mt-3 w-full">Necesito una pista</button>
+            <div id="m1_help" class="help-content">
+                <p><strong>Pista 1:</strong> Su ley es V = I * R.</p>
+                <p><strong>Pista Crucigrama:</strong> VOLTIO, LEY, OHMIOS. La clave se forma con la primera letra de VOLTIO, la primera de LEY y la tercera de OHMIOS.</p>
+                <p><strong>Pista 3:</strong> En serie, las resistencias se suman directamente: RT = R1 + R2 + R3.</p>
+            </div>
+            <p id="m1_feedback" class="mt-3 text-red-600 font-semibold"></p>
+        </section>
+
+        <!-- Misión 2: Componentes Saboteados -->
+        <section id="mission2" class="mission-section">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Misión 2: Identificando Componentes</h2>
+            <p class="mb-3">¡Acceso concedido! Ahora, identifica los símbolos de los componentes dañados en la placa del prototipo. Empareja símbolo con nombre. La primera letra de cada nombre correcto (en orden: Resistencia, Diodo, Condensador) forma una palabra clave.</p>
+            <div class="grid grid-cols-3 gap-4 mb-4 text-center">
+                <div>
+                    <!-- Símbolo Resistencia SVG -->
+                    <svg class="component-svg" viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="0" y1="20" x2="20" y2="20" stroke="black" stroke-width="2"/>
+                        <path d="M20 20 L25 10 L35 30 L45 10 L55 30 L65 10 L75 30 L80 20" stroke="black" stroke-width="2" fill="none"/>
+                        <line x1="80" y1="20" x2="100" y2="20" stroke="black" stroke-width="2"/>
+                    </svg>
+                    <p>Símbolo 1 (Resistencia)</p>
+                </div>
+                <div>
+                    <!-- Símbolo Diodo SVG -->
+                    <svg class="component-svg" viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="0" y1="20" x2="35" y2="20" stroke="black" stroke-width="2"/>
+                        <polygon points="35,10 35,30 55,20" stroke="black" stroke-width="2" fill="white"/>
+                        <line x1="55" y1="10" x2="55" y2="30" stroke="black" stroke-width="2"/>
+                        <line x1="55" y1="20" x2="100" y2="20" stroke="black" stroke-width="2"/>
+                    </svg>
+                    <p>Símbolo 2 (Diodo)</p>
+                </div>
+                <div>
+                    <!-- Símbolo Condensador (no polarizado) SVG -->
+                     <svg class="component-svg" viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="0" y1="20" x2="40" y2="20" stroke="black" stroke-width="2"/>
+                        <line x1="40" y1="5" x2="40" y2="35" stroke="black" stroke-width="2"/>
+                        <line x1="60" y1="5" x2="60" y2="35" stroke="black" stroke-width="2"/>
+                        <line x1="60" y1="20" x2="100" y2="20" stroke="black" stroke-width="2"/>
+                    </svg>
+                    <p>Símbolo 3 (Condensador)</p>
+                </div>
+            </div>
+             <input type="text" id="m2_clue1_answer" placeholder="Palabra clave (3 letras)" class="input-field w-full mb-3">
+
+            <p class="mb-2 mt-4">Uno de los componentes dañados es una resistencia con bandas: Marrón - Negro - Rojo - Oro. Descifra su valor en Ohms. Ese número es la clave para la siguiente etapa.</p>
+             <!-- Imagen Resistencia Código Colores (placeholder, reemplazar por una real o SVG si se desea mayor control) -->
+            <svg class="circuit-image" viewBox="0 0 150 50" xmlns="http://www.w3.org/2000/svg" style="max-width: 200px;">
+                <line x1="10" y1="25" x2="30" y2="25" stroke="#a5a5a5" stroke-width="3"/>
+                <rect x="30" y="15" width="90" height="20" fill="#f0e68c" rx="5" ry="5"/> <!-- Cuerpo de la resistencia (beige claro) -->
+                <!-- Bandas de color -->
+                <rect x="40" y="15" width="10" height="20" fill="#A52A2A"/> <!-- Marrón -->
+                <rect x="55" y="15" width="10" height="20" fill="black"/>   <!-- Negro -->
+                <rect x="70" y="15" width="10" height="20" fill="red"/>     <!-- Rojo -->
+                <rect x="95" y="15" width="10" height="20" fill="gold"/>    <!-- Oro -->
+                <line x1="120" y1="25" x2="140" y2="25" stroke="#a5a5a5" stroke-width="3"/>
+            </svg>
+            <input type="number" id="m2_clue2_answer" placeholder="Valor Resistencia (Ω)" class="input-field w-full mb-4">
+
+            <button onclick="checkMission2()" class="submit-button w-full">Verificar Componentes</button>
+            <button onclick="toggleHelp('m2_help')" class="help-button mt-3 w-full">Pista para componentes</button>
+            <div id="m2_help" class="help-content">
+                <p><strong>Pista 1:</strong> Los nombres son Resistencia, Diodo, Condensador.</p>
+                <p><strong>Pista 2:</strong> Marrón=1, Negro=0, Rojo=multiplicador x100. Oro=tolerancia 5%.</p>
+            </div>
+            <p id="m2_feedback" class="mt-3 text-red-600 font-semibold"></p>
+        </section>
+
+        <!-- Misión 3: Reparando el Flujo (igual que antes) -->
+        <section id="mission3" class="mission-section">
+            <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Misión 3: Reparando el Flujo</h2>
+            <p class="mb-3">¡Bien hecho! Para reactivar una sección, debes calcular la resistencia necesaria (en Ohms) para encender un LED rojo (2V, 20mA) de forma segura con una pila de 9V. Fórmula: R = (V_pila - V_LED) / I_LED.</p>
+            <input type="number" id="m3_clue1_answer" placeholder="Valor Resistencia Calculada (Ω)" class="input-field w-full mb-4">
+
+            <button onclick="checkMission3()" class="submit-button w-full">Confirmar Reparación</button>
+            <button onclick="toggleHelp('m3_help')" class="help-button mt-3 w-full">Ayuda con el cálculo</button>
+            <div id="m3_help" class="help-content">
+                <p>Recuerda convertir mA a A (20mA = 0.02A).</p>
+                <p>R = (9V - 2V) / 0.02A</p>
+            </div>
+            <p id="m3_feedback" class="mt-3 text-red-600 font-semibold"></p>
+        </section>
+
+        <!-- Misión Final / Conclusión (igual que antes) -->
+        <section id="final-section" class="mission-section text-center">
+            <h2 class="text-3xl font-bold text-green-600 mb-4">¡MISIÓN CUMPLIDA!</h2>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="text-xl mb-3">Has resuelto todos los enigmas y el <strong>Circuito Maestro</strong> vuelve a estar operativo gracias a tu ingenio y conocimientos de electricidad y electrónica.</p>
+            <p class="mb-6">¡El Dr. Ohm estaría orgulloso! Has salvado 'Spark Innovators'.</p>
+            <button onclick="restartGame()" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded">
+                Jugar de Nuevo
+            </button>
+        </section>
+
+    </div>
+
+    <script>
+        // --- EL MISMO JAVASCRIPT DE LA VERSIÓN ANTERIOR VA AQUÍ ---
+        // (No es necesario repetirlo, ya que no ha cambiado la lógica, solo el HTML para las imágenes)
+        let currentMission = 'intro-section';
+        const crosswordSolutions = {
+            voltio: "VOLTIO",
+            ley: "LEY",
+            ohmios: "OHMIOS"
+        };
+        const crosswordKeywordIndices = { // [palabra, indice_letra_en_palabra]
+            voltio: 0, // V
+            ley: 0,    // L
+            ohmios: 2  // M
+        };
+        const crosswordFinalKey = "VLM"; // La clave que se debe formar
+
+        const missionSolutions = {
+            mission1: { clue1: "OHM", crossword: crosswordFinalKey, clue3: "60"},
+            mission2: { clue1: "RDC", clue2: "1000" },
+            mission3: { clue1: "350" }
+        };
+
+        function showMission(missionId) {
+            document.getElementById(currentMission).classList.remove('active');
+            document.getElementById(missionId).classList.add('active');
+            currentMission = missionId;
+            window.scrollTo(0, 0); // Scroll to top
+        }
+
+        function startMission(missionId) {
+            showMission(missionId);
+        }
+
+        function toggleHelp(helpId) {
+            const helpElement = document.getElementById(helpId);
+            if (helpElement.style.display === "block") {
+                helpElement.style.display = "none";
+            } else {
+                helpElement.style.display = "block";
+            }
+        }
+
+        function displayFeedback(missionId, message, isError = true) {
+            const feedbackEl = document.getElementById(`${missionId}_feedback`);
+            if(feedbackEl) { // Asegurarse que el elemento existe
+                feedbackEl.textContent = message;
+                feedbackEl.className = `mt-3 font-semibold ${isError ? 'text-red-600' : 'text-green-600'}`;
+            }
+        }
+
+        // --- Funcionalidad del Crucigrama ---
+        const crosswordInputs = document.querySelectorAll('.crossword-input');
+        crosswordInputs.forEach(input => {
+            input.addEventListener('input', handleCrosswordInput);
+            input.addEventListener('keydown', handleCrosswordKeydown);
+        });
+
+        function handleCrosswordInput(e) {
+            const currentInput = e.target;
+            currentInput.value = currentInput.value.toUpperCase(); // Forzar mayúsculas
+
+            // Auto-focus al siguiente input en la misma palabra
+            const word = currentInput.dataset.word;
+            const index = parseInt(currentInput.dataset.index);
+            const nextInputInWord = document.getElementById(`cw_${word}_${index + 1}`);
+
+            if (currentInput.value.length === 1 && nextInputInWord) {
+                nextInputInWord.focus();
+            }
+            checkCrossword(); // Verificar después de cada entrada
+        }
+
+        function handleCrosswordKeydown(e) {
+            const currentInput = e.target;
+            const word = currentInput.dataset.word;
+            const index = parseInt(currentInput.dataset.index);
+
+            if (e.key === "Backspace" && currentInput.value.length === 0) {
+                const prevInputInWord = document.getElementById(`cw_${word}_${index - 1}`);
+                if (prevInputInWord) {
+                    prevInputInWord.focus();
+                }
+            }
+        }
+
+        function checkCrossword() {
+            let allWordsCorrect = true;
+            let formedKeyword = "";
+            const feedbackEl = document.getElementById('crossword_feedback');
+
+            for (const word in crosswordSolutions) {
+                let currentWordEntered = "";
+                for (let i = 0; i < crosswordSolutions[word].length; i++) {
+                    const inputEl = document.getElementById(`cw_${word}_${i}`);
+                    if (inputEl) {
+                        currentWordEntered += inputEl.value.toUpperCase();
+                    }
+                }
+                if (currentWordEntered !== crosswordSolutions[word]) {
+                    allWordsCorrect = false;
+                }
+            }
+
+            if (allWordsCorrect) {
+                feedbackEl.textContent = "¡Todas las palabras del crucigrama son correctas!";
+                feedbackEl.className = "text-sm mt-2 text-green-600";
+                // Formar la clave
+                formedKeyword += document.getElementById(`cw_voltio_${crosswordKeywordIndices.voltio}`).value.toUpperCase();
+                formedKeyword += document.getElementById(`cw_ley_${crosswordKeywordIndices.ley}`).value.toUpperCase();
+                formedKeyword += document.getElementById(`cw_ohmios_${crosswordKeywordIndices.ohmios}`).value.toUpperCase();
+                document.getElementById('m1_crossword_key').value = formedKeyword;
+            } else {
+                feedbackEl.textContent = "Sigue intentando con las palabras del crucigrama...";
+                feedbackEl.className = "text-sm mt-2 text-gray-600";
+                document.getElementById('m1_crossword_key').value = ""; // Limpiar si no es correcto
+            }
+        }
+        // --- Fin Funcionalidad del Crucigrama ---
+
+
+        function checkMission1() {
+            const ans1 = document.getElementById('m1_clue1_answer').value.trim().toUpperCase();
+            const crosswordKey = document.getElementById('m1_crossword_key').value.trim().toUpperCase();
+            const ans3 = document.getElementById('m1_clue3_answer').value.trim();
+
+            if (ans1 === missionSolutions.mission1.clue1 &&
+                crosswordKey === missionSolutions.mission1.crossword &&
+                ans3 === missionSolutions.mission1.clue3) {
+                displayFeedback('m1', '¡Correcto! Accediendo al sistema...', false);
+                setTimeout(() => showMission('mission2'), 1500);
+            } else {
+                let errorMsg = "Respuesta incorrecta. Pistas: ";
+                if (ans1 !== missionSolutions.mission1.clue1) errorMsg += "Revisa el apellido. ";
+                if (crosswordKey !== missionSolutions.mission1.crossword) errorMsg += "Revisa la clave del crucigrama. ";
+                if (ans3 !== missionSolutions.mission1.clue3) errorMsg += "Revisa el cálculo de Resistencia Total. ";
+                displayFeedback('m1', errorMsg.trim());
+            }
+        }
+
+        function checkMission2() {
+            const ans1 = document.getElementById('m2_clue1_answer').value.trim().toUpperCase();
+            const ans2 = document.getElementById('m2_clue2_answer').value.trim();
+
+            if (ans1 === missionSolutions.mission2.clue1 && ans2 === missionSolutions.mission2.clue2) {
+                displayFeedback('m2', '¡Componentes identificados! Preparando simulación...', false);
+                setTimeout(() => showMission('mission3'), 1500);
+            } else {
+                 let errorMsg = "Respuesta incorrecta. Pistas: ";
+                if (ans1 !== missionSolutions.mission2.clue1) errorMsg += "Revisa la palabra clave de los componentes. ";
+                if (ans2 !== missionSolutions.mission2.clue2) errorMsg += "Revisa el valor de la resistencia por colores. ";
+                displayFeedback('m2', errorMsg.trim());
+            }
+        }
+
+        function checkMission3() {
+            const ans1 = document.getElementById('m3_clue1_answer').value.trim();
+
+            if (ans1 === missionSolutions.mission3.clue1) {
+                displayFeedback('m3', '¡Cálculo perfecto! El flujo de energía se restaura...', false);
+                setTimeout(() => showMission('final-section'), 1500);
+            } else {
+                displayFeedback('m3', 'Cálculo incorrecto. ¡Inténtalo de nuevo! Revisa la fórmula y unidades.');
+            }
+        }
+
+        function restartGame() {
+            ['m1_clue1_answer', 'm1_clue3_answer', 'm2_clue1_answer', 'm2_clue2_answer', 'm3_clue1_answer', 'm1_crossword_key'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            document.querySelectorAll('.crossword-input').forEach(input => input.value = ''); // Limpiar inputs del crucigrama
+            ['m1_feedback', 'm2_feedback', 'm3_feedback', 'crossword_feedback'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = '';
+            });
+            ['m1_help', 'm2_help', 'm3_help'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+
+            showMission('intro-section');
+        }
+    </script>
+
+</body>
+</html>
